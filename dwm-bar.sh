@@ -1,5 +1,7 @@
+#!/bin/bash
+
 Date() {
-    x=$(date +%D)
+    x=$(date '+%a %b %D')
     echo $x
 }
 
@@ -9,18 +11,26 @@ Time() {
 }
 
 Batt() {
-    x=$(cat /sys/class/power_supply/BAT1/capacity)
-    echo "BAT $x"
+  status=$(cat /sys/class/power_supply/BAT1/status)
+  capacity=$(cat /sys/class/power_supply/BAT1/capacity)
+
+  case $status in
+    Charging)
+      echo -e "CHR +$capacity%";;
+    Discharging)
+      echo "BAT $capacity%";;
+    *)
+      echo "BAT $capacity%";;
+  esac
 }
 
 Bar() {
-    echo " [ $(Batt) ] [ $(Time) ] [ $(Date) ] "
+    echo "[ $(Batt) ] [ $(Time) ] [ $(Date) ]"
 }
 
+# event loop
 while :
 do
-    sleep 1
+    sleep 5
     xsetroot -name "$(Bar)"
 done
-
-
